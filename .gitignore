@@ -1,0 +1,17 @@
+# .NET
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Publish
+publish/
+
+# Secrets
+.env
+*.env.local
+
+# Operating System
+.DS_Store
+Thumbs.db

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinSim-AI | Market Simulator</title>
+    <meta name="description"
+        content="Simulador de dinámicas de mercado financiero impulsado por agentes de IA con mandatos conflictivos.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=1">
+    <link rel="icon" type="image/png" href="/logo.png?v=1">
+</head>
+
+<body>
+    <!-- HEADER: Macro Ticker + Risk Gauge -->
+    <header class="header">
+        <div class="header__brand">
+            <div class="header__logo">
+                <img src="logo.png" alt="FinSim-AI Logo"
+                    style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.4));">
+            </div>
+            <h1 class="header__title">FinSim-AI</h1>
+            <span class="header__badge">v1.0 · Educational</span>
+        </div>
+        <div class="header__ticker" id="macroTicker">
+            <div class="ticker__item">
+                <span class="ticker__label">Inflación</span>
+                <span class="ticker__value" id="tickerInflation">3.10%</span>
+            </div>
+            <div class="ticker__divider"></div>
+            <div class="ticker__item">
+                <span class="ticker__label">Tasas</span>
+                <span class="ticker__value" id="tickerRates">5.25%</span>
+            </div>
+            <div class="ticker__divider"></div>
+            <div class="ticker__item">
+                <span class="ticker__label">Liquidez</span>
+                <span class="ticker__value" id="tickerLiquidity">100.0</span>
+            </div>
+            <div class="ticker__divider"></div>
+            <div class="ticker__item ticker__sentiment">
+                <span class="ticker__label">Sentimiento</span>
+                <span class="ticker__value" id="tickerSentiment">NEUTRAL</span>
+            </div>
+        </div>
+        <nav class="header__nav">
+            <button class="nav__tab active" data-tab="simulator" onclick="switchTab('simulator')">Simulador</button>
+            <button class="nav__tab" data-tab="methodology" onclick="switchTab('methodology')">Metodología</button>
+            <button class="nav__tab" data-tab="settings" onclick="switchTab('settings')">⚙ Settings</button>
+        </nav>
+    </header>
+
+    <!-- TAB: SIMULADOR -->
+    <main class="main" id="tab-simulator">
+        <div class="layout">
+            <!-- Panel Izquierdo: God Mode -->
+            <aside class="panel panel--god">
+                <div class="panel__header">
+                    <h2 class="panel__title">🌍 God Mode</h2>
+                    <p class="panel__subtitle">Arquitecto Macro</p>
+                </div>
+
+                <div class="god__controls">
+                    <label class="control__label">Inflación (%)</label>
+                    <input type="range" id="sliderInflation" class="control__slider" min="0" max="15" step="0.1"
+                        value="3.1">
+                    <span class="control__value" id="valInflation">3.1%</span>
+
+                    <label class="control__label">Tasas de Interés (%)</label>
+                    <input type="range" id="sliderRates" class="control__slider" min="0" max="20" step="0.25"
+                        value="5.25">
+                    <span class="control__value" id="valRates">5.25%</span>
+
+                    <label class="control__label">Liquidez Global <span class="tooltip"
+                            data-tip="Índice base 100. Valores < 100 = contracción monetaria, > 100 = expansión. Ej: 50 = sequía de liquidez, 150 = QE agresivo.">ⓘ</span></label>
+                    <input type="range" id="sliderLiquidity" class="control__slider" min="0" max="200" step="1"
+                        value="100">
+                    <span class="control__value" id="valLiquidity">100</span>
+
+                    <button class="btn btn--update" id="btnUpdateWorld" onclick="updateWorldState()">Aplicar
+                        Macro</button>
+                </div>
+
+                <div class="god__input">
+                    <label class="control__label">Evento / Shock Ambiental</label>
+                    <textarea id="eventInput" class="input__textarea"
+                        placeholder="Ej: La FED anuncia compra masiva de Bitcoin..." rows="4"></textarea>
+                    <button class="btn btn--execute" id="btnExecute" onclick="runSimulation()">
+                        <span class="btn__icon">⚡</span> Ejecutar Simulación
+                    </button>
+                </div>
+
+                <!-- Risk Gauge -->
+                <div class="gauge">
+                    <div class="gauge__header">Risk Index</div>
+                    <div class="gauge__bar">
+                        <div class="gauge__fill" id="riskGaugeFill" style="width: 50%;"></div>
+                        <div class="gauge__marker" id="riskGaugeMarker"></div>
+                    </div>
+                    <div class="gauge__labels">
+                        <span>-1.0 Pánico</span>
+                        <span>0.0</span>
+                        <span>+1.0 Euforia</span>
+                    </div>
+                    <div class="gauge__score" id="riskGaugeScore">0.00</div>
+                </div>
+
+                <!-- Reset Button -->
+                <div class="god__reset">
+                    <button class="btn btn--reset" id="btnReset" onclick="resetSimulation()">
+                        <span class="btn__icon">🔄</span> Reset (Nuevo Escenario)
+                    </button>
+                    <p class="reset__hint">Limpia la memoria de todos los agentes y reinicia los parámetros macro a
+                        valores por defecto.</p>
+                </div>
+            </aside>
+
+            <!-- Centro: Feed de Agentes -->
+            <section class="panel panel--feed">
+                <div class="panel__header">
+                    <h2 class="panel__title">📡 Reacciones de Agentes</h2>
+                    <p class="panel__subtitle">Secuencia Causal Aislada</p>
+                </div>
+                <div class="feed" id="agentFeed">
+                    <div class="feed__empty">
+                        <div class="feed__empty-icon">🏛</div>
+                        <p>Ingresa un evento macroeconómico para iniciar la simulación.</p>
+                        <p class="feed__hint">Los agentes reaccionarán de forma independiente y aislada.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Panel Derecho: CIO Report -->
+            <aside class="panel panel--cio">
+                <div class="panel__header">
+                    <h2 class="panel__title">📊 CIO Report</h2>
+                    <p class="panel__subtitle">Síntesis Estratégica</p>
+                </div>
+
+                <div class="cio" id="cioPanel">
+                    <div class="cio__empty">
+                        <p>El Analista CIO sintetizará las reacciones después de la simulación.</p>
+                    </div>
+                </div>
+
+                <!-- Probabilidades -->
+                <div class="cio__probs hidden" id="cioProbs">
+                    <h3 class="cio__probs-title">Probabilidades <span class="tooltip"
+                            data-tip="Distribución de probabilidad del CIO sobre la dirección del mercado a corto plazo. Los 3 valores suman 100%.">ⓘ</span>
+                    </h3>
+                    <div class="prob__bar">
+                        <div class="prob__segment prob--bull" id="probBull" style="width: 33%;">
+                            <span>Bull</span>
+                        </div>
+                        <div class="prob__segment prob--neutral" id="probNeutral" style="width: 34%;">
+                            <span>Neutral</span>
+                        </div>
+                        <div class="prob__segment prob--bear" id="probBear" style="width: 33%;">
+                            <span>Bear</span>
+                        </div>
+                    </div>
+                    <div class="cio__conviction">
+                        <span class="conviction__label">Conviction Score <span class="tooltip"
+                                data-tip="Nivel de confianza del CIO en su proyección. -1.0 = convicción bajista extrema, 0 = incertidumbre total, +1.0 = convicción alcista extrema.">ⓘ</span></span>
+                        <span class="conviction__value" id="convictionScore">0.0</span>
+                    </div>
+                </div>
+
+                <!-- JSON Raw -->
+                <div class="cio__json hidden" id="cioJson">
+                    <h3 class="cio__json-title">JSON Output</h3>
+                    <pre class="json__block" id="jsonBlock"></pre>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- TAB: METODOLOGÍA -->
+    <main class="main hidden" id="tab-methodology">
+        <div class="methodology">
+            <div class="method__hero">
+                <h2>📘 Metodología FinSim-AI</h2>
+                <p class="method__subtitle">Arquitectura Multi-Agente para Simulación de Mercados Financieros</p>
+            </div>
+
+            <div class="method__grid">
+                <!-- Sección 1: Visión General -->
+                <div class="method__card">
+                    <div class="method__card-icon">🧠</div>
+                    <h3>Visión General</h3>
+                    <p>FinSim-AI es un simulador de dinámicas de mercado que utiliza <strong>4 agentes de IA
+                            independientes</strong> con mandatos financieros conflictivos. Cada agente representa una
+                        clase de participante real del mercado.</p>
+                    <p>El objetivo es observar cómo las reacciones aisladas de entidades con incentivos opuestos generan
+                        <em>comportamiento emergente de mercado</em>: volatilidad, trampas de liquidez y rotaciones de
+                        capital.
+                    </p>
+                </div>
+
+                <!-- Sección 2: Agentes -->
+                <div class="method__card">
+                    <div class="method__card-icon">👥</div>
+                    <h3>Los 4 Agentes</h3>
+                    <div class="method__agents">
+                        <div class="method__agent" style="border-left: 3px solid #00d4ff;">
+                            <strong>Vanguard-IG</strong> (Institucional)
+                            <p>Fondos de pensiones y soberanos. 50% Bonos, 30% Acciones, 15% Real Estate, 5% Oro/BTC.
+                                Prioriza la preservación del poder adquisitivo real.</p>
+                        </div>
+                        <div class="method__agent" style="border-left: 3px solid #ff4d6a;">
+                            <strong>Aura-Hedge</strong> (Smart Money)
+                            <p>Hedge Fund Global Macro. 130% exposición bruta (Long/Short). Busca asimetría y
+                                oportunidades contrarias al consenso.</p>
+                        </div>
+                        <div class="method__agent" style="border-left: 3px solid #ffd700;">
+                            <strong>Reddit-Retail</strong> (La Masa)
+                            <p>Inversores minoristas agregados. 60% Nasdaq, 30% Crypto, 10% Cash. Momentum puro: FOMO o
+                                Panic Selling.</p>
+                        </div>
+                        <div class="method__agent" style="border-left: 3px solid #c850ff;">
+                            <strong>Citadel-MM</strong> (Infraestructura)
+                            <p>Market Maker delta neutral. Recibe Order Flow privilegiado para detectar trampas de
+                                liquidez. Amplía spreads en volatilidad extrema.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 3: Aislamiento Cognitivo -->
+                <div class="method__card">
+                    <div class="method__card-icon">🔒</div>
+                    <h3>Aislamiento Cognitivo</h3>
+                    <p>Característica crítica: los agentes <strong>NO pueden ver</strong> las respuestas de los demás
+                        durante un turno. Cada uno reacciona únicamente al evento macro y a su propio historial.</p>
+                    <div class="method__flow">
+                        <div class="flow__step">
+                            <img src="logo.png" alt="" style="width: 16px; margin-bottom: 4px; display: block;">
+                            Evento
+                        </div>
+                        <div class="flow__arrow">→</div>
+                        <div class="flow__step flow--parallel">
+                            <span style="color:#ffd700;">Retail</span>
+                            <span style="color:#ff4d6a;">Hedge</span>
+                            <span style="color:#00d4ff;">Inst.</span>
+                        </div>
+                        <div class="flow__arrow">→</div>
+                        <div class="flow__step" style="color:#c850ff;">Citadel<br><small>(Order Flow)</small></div>
+                        <div class="flow__arrow">→</div>
+                        <div class="flow__step" style="color:#00ff88;">CIO<br><small>(Síntesis)</small></div>
+                    </div>
+                    <p>Solo <strong>Citadel</strong> ve el flujo agregado (las órdenes, no las opiniones). El
+                        <strong>CIO</strong> sintetiza todo al final.
+                    </p>
+                </div>
+
+                <!-- Sección 4: Order Flow -->
+                <div class="method__card">
+                    <div class="method__card-icon">📊</div>
+                    <h3>Order Flow Inteligente</h3>
+                    <p>En lugar de usar heurísticas de palabras clave, el sistema <strong>parsea los tags
+                            estandarizados</strong> que cada agente emite:</p>
+                    <pre class="method__code">[RISK: 0.6]
+[ORDER: SELL BONDS HIGH]
+[ORDER: BUY BTC MEDIUM]
+[ORDER: HEDGE VIX LOW]</pre>
+                    <p>Citadel recibe estas señales reales para determinar si hay <em>liquidez genuina</em> o una
+                        <em>trampa de liquidez</em>.
+                    </p>
+                </div>
+
+                <!-- Sección 5: CIO Synthesis -->
+                <div class="method__card">
+                    <div class="method__card-icon">🎯</div>
+                    <h3>Síntesis CIO</h3>
+                    <p>Un quinto agente de IA actúa como <strong>Chief Investment Officer</strong>, sintetizando las 4
+                        reacciones en:</p>
+                    <ul>
+                        <li><strong>Narrativa situacional</strong>: Descripción cualitativa del estado del mercado.</li>
+                        <li><strong>Probabilidades</strong>: % Bullish, Neutral, Bearish.</li>
+                        <li><strong>Conviction Score</strong>: -1.0 (pánico total) a +1.0 (euforia).</li>
+                        <li><strong>JSON estructurado</strong>: Formato parseable para integraciones futuras.</li>
+                    </ul>
+                </div>
+
+                <!-- Sección 6: World State -->
+                <div class="method__card">
+                    <div class="method__card-icon">🌎</div>
+                    <h3>World State Dinámico</h3>
+                    <p>El contexto macroeconómico (Inflación, Tasas, Liquidez) se inyecta en los prompts de cada agente.
+                        El usuario ("Dios") puede modificar estas variables en tiempo real para observar cómo cambian
+                        las reacciones.</p>
+                    <p>Al final de cada turno, el reporte del CIO se inyecta a la memoria de todos los agentes, creando
+                        <strong>memoria compartida de mercado</strong> para el siguiente turno.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- TAB: SETTINGS -->
+    <main class="main hidden" id="tab-settings">
+        <div class="settings">
+            <div class="settings__hero">
+                <h2>⚙ Configuración</h2>
+                <p class="settings__subtitle">API Keys y Parámetros del Motor</p>
+            </div>
+
+            <div class="settings__grid">
+                <div class="settings__card">
+                    <h3>🔑 Proveedores de IA</h3>
+                    <p class="settings__hint">Las claves se almacenan en el archivo <code>.env</code> local.</p>
+
+                    <div class="settings__field">
+                        <label>Proveedor Activo</label>
+                        <select id="settingProvider" class="settings__select">
+                            <option value="openrouter">OpenRouter</option>
+                            <option value="openai">OpenAI</option>
+                            <option value="google">Google Gemini</option>
+                        </select>
+                    </div>
+
+                    <div class="settings__field">
+                        <label>OpenRouter API Key</label>
+                        <input type="password" id="settingOpenRouterKey" class="settings__input"
+                            placeholder="sk-or-v1-...">
+                    </div>
+                    <div class="settings__field">
+                        <label>OpenRouter Model</label>
+                        <input type="text" id="settingOpenRouterModel" class="settings__input"
+                            placeholder="openrouter/free">
+                    </div>
+
+                    <div class="settings__field">
+                        <label>OpenAI API Key</label>
+                        <input type="password" id="settingOpenAIKey" class="settings__input" placeholder="sk-proj-...">
+                    </div>
+                    <div class="settings__field">
+                        <label>OpenAI Model</label>
+                        <input type="text" id="settingOpenAIModel" class="settings__input" placeholder="gpt-4o">
+                    </div>
+
+                    <div class="settings__field">
+                        <label>Google Gemini API Key</label>
+                        <input type="password" id="settingGoogleKey" class="settings__input" placeholder="AIza...">
+                    </div>
+                    <div class="settings__field">
+                        <label>Google Gemini Model</label>
+                        <input type="text" id="settingGoogleModel" class="settings__input"
+                            placeholder="gemini-2.0-flash">
+                    </div>
+
+                    <button class="btn btn--save" onclick="saveSettings()">💾 Guardar Configuración</button>
+                </div>
+
+                <div class="settings__card">
+                    <h3>📊 World State Inicial</h3>
+                    <p class="settings__hint">Define el punto de partida macroeconómico para la simulación.</p>
+
+                    <div class="settings__field">
+                        <label>Inflación Inicial (%)</label>
+                        <input type="number" id="settingInflation" class="settings__input" value="3.1" step="0.1">
+                    </div>
+                    <div class="settings__field">
+                        <label>Tasas de Interés Iniciales (%)</label>
+                        <input type="number" id="settingRates" class="settings__input" value="5.25" step="0.25">
+                    </div>
+                    <div class="settings__field">
+                        <label>Liquidez Global (Base 100)</label>
+                        <input type="number" id="settingLiquidity" class="settings__input" value="100" step="1">
+                    </div>
+
+                    <button class="btn btn--save" onclick="applyInitialState()">🌍 Aplicar Estado Inicial</button>
+                </div>
+
+                <div class="settings__card">
+                    <h3>🔧 Parámetros del Motor</h3>
+                    <p class="settings__hint">Controles avanzados para calibración.</p>
+
+                    <div class="settings__field">
+                        <label>Max Tokens por Respuesta</label>
+                        <input type="number" id="settingMaxTokens" class="settings__input" value="800">
+                    </div>
+                    <div class="settings__field">
+                        <label>Temperature (Determinismo)</label>
+                        <input type="number" id="settingTemperature" class="settings__input" value="0.2" step="0.1"
+                            min="0" max="2">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
