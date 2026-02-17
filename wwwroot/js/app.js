@@ -144,11 +144,36 @@ async function updateWorldState() {
 // --- Reset Simulation ---
 async function resetSimulation() {
     if (isRunning) return;
+    
+    const btnReset = document.getElementById('btnReset');
+    const originalHTML = btnReset.innerHTML;
+    
+    // Visual feedback: botón en estado de carga
+    btnReset.disabled = true;
+    btnReset.innerHTML = '<span class="btn__icon">⏳</span> Reseteando...';
+    btnReset.style.opacity = '0.6';
+    
     try {
         await connection.invoke("ResetSimulation");
+        
+        // Feedback de éxito
+        btnReset.innerHTML = '<span class="btn__icon">✅</span> ¡Memoria Limpia!';
+        btnReset.style.background = 'rgba(0, 255, 136, 0.2)';
+        
+        // Restaurar después de 2 segundos
+        setTimeout(() => {
+            btnReset.innerHTML = originalHTML;
+            btnReset.style.background = '';
+            btnReset.style.opacity = '';
+            btnReset.disabled = false;
+        }, 2000);
+        
     } catch (err) {
         console.error("Error en reset:", err);
         alert('❌ Error al resetear: ' + err.message);
+        btnReset.innerHTML = originalHTML;
+        btnReset.style.opacity = '';
+        btnReset.disabled = false;
     }
 }
 
