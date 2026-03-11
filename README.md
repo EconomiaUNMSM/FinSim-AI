@@ -1,98 +1,101 @@
 # FinSim-AI | Quantum Market Simulator 🚀
 
-FinSim-AI es un simulador avanzado de dinámicas de mercado financiero impulsado por múltiples agentes de Inteligencia Artificial con incentivos y mandatos conflictivos. A diferencia de las simulaciones lineales, este motor explora el comportamiento emergente del mercado a través de una arquitectura multi-agente aislada.
+[English](README.md) | [Español](README.es.md) | [Português](README.pt.md) | [中文](README.zh.md)
 
-![Presentación de FinSim-AI](assets/app_presentacion.png)
+FinSim-AI is an advanced simulator of financial market dynamics powered by multiple Artificial Intelligence agents with conflicting incentives and mandates. Unlike linear simulations, this engine explores the emergent behavior of the market through an isolated multi-agent architecture.
 
----
 
-## 📊 Dinámicas de Simulación
-Después de ejecutar una simulación ante un evento macroeconómico o un shock ambiental, el sistema genera un flujo causal de reacciones:
-
-![Output de Simulación](assets/app_final.png)
-
-### El Output:
-- **Reacciones de Agentes**: Cada agente (Retail, Hedge Fund, Institucional) emite un juicio subjetivo y un "Risk Score".
-- **Order Flow**: El agente Market Maker (Citadel-MM) procesa las órdenes agregadas para determinar la liquidez real.
-- **CIO Report**: Un quinto agente sintetiza todo en una narrativa estratégica, calculando probabilidades (Bull/Bear/Neutral) y un índice de convicción del mercado.
+![FinSim-AI Demo](assets/video_muestra_2.gif)
 
 ---
 
-## 🧠 Metodología: Aislamiento Cognitivo
-El sustento de FinSim-AI reside en que cada agente opera en un entorno de aislamiento cognitivo durante su turno de decisión.
+## 📊 Simulation Dynamics
+After running a simulation given a macroeconomic event or an environmental shock, the system generates a causal flow of reactions:
 
-![Metodología](assets/app_metodologia.png)
+![Simulation Output](assets/app_final.png)
 
-### Conceptos Clave:
-1. **Incentivos Opuestos**: Cada agente tiene una cartera y un mandato específico (ej. Vanguard busca seguridad, Aura busca asimetría).
-2. **Memoria Compartida**: Al final de cada turno, el reporte del CIO se inyecta en la memoria de todos los agentes, creando una "consciencia de mercado" para el siguiente ciclo.
-3. **Causalidad Secuencial**: Las reacciones no son aleatorias; se basan en el estado actual de Inflación, Tasas y Liquidez Global.
-
----
-
-## ⚙️ Configuración y Motor de IA
-FinSim-AI es agnóstico al modelo. Puedes configurar diversos cerebros para tus agentes.
-
-![Configuración](assets/app_settings.png)
-
-### Parámetros Ajustables:
-- **Proveedores**: Soporte para OpenRouter, OpenAI y Google Gemini.
-- **Modelos**: Desde modelos ligeros (flash) hasta modelos razonadores potentes (o1, gpt-4o).
-- **Parámetros del Motor**:
-    - **Max Tokens**: Controla la profundidad de la narrativa de los agentes.
-    - **Temperature**: Ajusta el determinismo vs. creatividad en las reacciones.
-- **Estado Inicial**: Define el punto de partida macroeconómico (Inflación, Tasas y Liquidez).
+### The Output:
+- **Agent Reactions**: Each agent (Retail, Hedge Fund, Institutional) issues a subjective judgment and a "Risk Score".
+- **Order Flow**: The Market Maker agent (Citadel-MM) processes the aggregated orders to determine actual liquidity.
+- **CIO Report**: A fifth agent synthesizes everything into a strategic narrative, calculating probabilities (Bull/Bear/Neutral) and a market conviction index.
 
 ---
 
-## 🛠️ Ejecución y Desarrollo
-Si deseas ejecutar el proyecto desde el código fuente o contribuir al desarrollo, sigue estos pasos:
+## 🧠 Methodology: Cognitive Isolation
+The foundation of FinSim-AI lies in each agent operating in an environment of cognitive isolation during its decision turn.
 
-### Prerrequisitos
-- Tener instalado el **.NET SDK** (v8.0 o superior).
+![Methodology](assets/app_metodologia.png)
 
-### Pasos
-1. **Clonar el repositorio**:
+### Key Concepts:
+1. **Opposing Incentives**: Each agent has a specific portfolio and mandate (e.g., Vanguard seeks safety, Aura seeks asymmetry).
+2. **Shared Memory**: At the end of each turn, the CIO report is injected into the memory of all agents, creating a "market consciousness" for the next cycle.
+3. **Sequential Causality**: Reactions are not random; they are based on the current state of Inflation, Rates, and Global Liquidity.
+
+---
+
+## ⚙️ Configuration and AI Engine
+FinSim-AI is model-agnostic. You can configure various brains for your agents.
+
+![Configuration](assets/app_settings.png)
+
+### Adjustable Parameters:
+- **Providers**: Support for OpenRouter, OpenAI, and Google Gemini.
+- **Models**: From lightweight models (flash) to powerful reasoning models (o1, gpt-4o).
+- **Engine Parameters**:
+    - **Max Tokens**: Controls the depth of the agents' narrative.
+    - **Temperature**: Adjusts determinism vs. creativity in the reactions.
+- **Initial State**: Defines the macroeconomic starting point (Inflation, Rates, and Liquidity).
+
+---
+
+## 🛠️ Execution and Development
+If you want to run the project from source or contribute to the development, follow these steps:
+
+### Prerequisites
+- Have the **.NET SDK** (v8.0 or higher) installed.
+
+### Steps
+1. **Clone the repository**:
    ```bash
-   git clone https://github.com/TU_USUARIO/FinSim-AI.git
+   git clone https://github.com/EconomiaUNMSM/FinSim-AI.git
    cd FinSim-AI
    ```
-2. **Instalar dependencias**:
+2. **Install dependencies**:
    ```bash
    dotnet restore
    ```
-3. **Ejecutar la aplicación**:
+3. **Run the application**:
    ```bash
    dotnet run
    ```
-   *La aplicación se abrirá automáticamente en tu navegador predeterminado (usualmente en http://localhost:5000).*
+   *The application will automatically open in your default browser (usually at http://localhost:5000).*
 
 ---
 
-## 🎯 Utilidad, Casos de Uso y Limitaciones
+## 🎯 Utility, Use Cases, and Limitations
 
-### Utilidad
-FinSim-AI sirve para explorar escenarios "What If" (¿Qué pasaría si...?) en entornos financieros complejos, permitiendo entender cómo la psicología de diferentes participantes interactúa ante noticias macroeconómicas.
+### Utility
+FinSim-AI serves to explore "What If" scenarios in complex financial environments, allowing one to understand how the psychology of different participants interacts with macroeconomic news.
 
-### Casos de Uso
-- **Educación Financiera**: Comprender la relación entre tasas de interés y apetito de riesgo.
-- **Análisis de Narrativa**: Observar cómo una noticia puede ser interpretada de formas opuestas por distintos sectores.
-- **Wargaming Financiero**: Simular ataques especulativos o crisis de liquidez.
+### Use Cases
+- **Financial Education**: Understand the relationship between interest rates and risk appetite.
+- **Narrative Analysis**: Observe how a piece of news can be interpreted in opposing ways by different sectors.
+- **Financial Wargaming**: Simulate speculative attacks or liquidity crises.
 
-### Limitaciones
-- **Naturaleza Sintética**: Las reacciones dependen de la calidad del modelo de lenguaje utilizado.
-- **Falta de Ejecución Real**: Es un simulador cualitativo, no un motor de trading cuantitativo. No procesa datos de mercado en tiempo real.
-
----
-
-## ⚠️ Disclaimer (Descargo de Responsabilidad)
-**ESTA ES UNA HERRAMIENTA EXCLUSIVAMENTE EDUCATIVA Y DE ENTRETENIMIENTO.**
-FinSim-AI no constituye, ni debe ser interpretado como:
-- Asesoría financiera profesional.
-- Recomendaciones de inversión o trading.
-- Proyecciones reales de comportamiento de mercado.
-
-Las inversiones financieras conllevan riesgos significativos. Siempre consulte con un asesor financiero certificado antes de tomar cualquier decisión de inversión real. El autor no se hace responsable de las pérdidas incurridas por el uso de esta herramienta.
+### Limitations
+- **Synthetic Nature**: Reactions depend on the quality of the language model used.
+- **Lack of Real Execution**: It is a qualitative simulator, not a quantitative trading engine. It does not process real-time market data.
 
 ---
-*Desarrollado por EconomiaUNMSM.*
+
+## ⚠️ Disclaimer
+**THIS IS STRICTLY AN EDUCATIONAL AND ENTERTAINMENT TOOL.**
+FinSim-AI does not constitute, nor should it be interpreted as:
+- Professional financial advice.
+- Investment or trading recommendations.
+- Real projections of market behavior.
+
+Financial investments carry significant risks. Always consult with a certified financial advisor before making any real investment decision. The author is not responsible for losses incurred by the use of this tool.
+
+---
+*Developed by EconomiaUNMSM.*
